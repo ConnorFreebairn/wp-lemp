@@ -144,12 +144,6 @@ rootPath=$2
 sitesEnable='/etc/nginx/sites-enabled/'
 sitesAvailable='/etc/nginx/sites-available/'
 serverRoot='/var/www/'
-domainRegex="^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$"
-
-if [ -e $newdomain ]; then
-        echo "This domain already exists.\nPlease Try Another one"
-        exit;
-fi
 
 
 if [ "$rootPath" = "" ]; then
