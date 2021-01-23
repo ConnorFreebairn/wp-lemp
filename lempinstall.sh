@@ -137,129 +137,7 @@ mkdir -pv /var/www/phpmyadmin/tmp; chown www-data:www-data /var/www/phpmyadmin/t
 # Symlink phpMyAdmin, create logs dir and set permissions and ownership on /var/www
 ln -s /var/www/phpmyadmin/ /var/www/html/phpmyadmin;  mkdir -pv /var/www/logs;  chown www-data:www-data /var/www/html; chown www-data:www-data /var/www/logs; chown www-data:www-data /var/www; chmod -R g+rw /var/www;
 
-# Create Nginx virtual host config
-newdomain=""
-domain=$1
-rootPath=$2
-sitesEnable='/etc/nginx/sites-enabled/'
-sitesAvailable='/etc/nginx/sites-available/'
-serverRoot='/var/www/'
-domainRegex="^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$"
-
-while [ "$domain" = "" ]
-do
-        echo "Please provide your PRIMARY domain (sub domain not required):"
-        read domain
-done
-
-until [[ $domain =~ $domainRegex ]]
-do
-        echo "Enter valid domain:"
-        read domain
-done
-
-echo "Enter sub domain:"
-        read subdomain
-
-if [ -z "$subdomain" ]
-then
-		newdomain="$domain"
-echo $newdomain
-else
-	
-		newdomain="${subdomain}.${domain}"
-
-echo $newdomain
-fi
-
-
-
-if [ -e $newdomain ]; then
-        echo "This domain already exists.\nPlease Try Another one"
-        exit;
-fi
-
-
-if [ "$rootPath" = "" ]; then
-        rootPath=$serverRoot$newdomain
-fi
-
-if ! [ -d $rootPath ]; then
-        mkdir -pv $rootPath
-        chmod 777 $rootPath
-        if ! echo "<?php
-
-// Show all information, defaults to INFO_ALL
-phpinfo();
-
-// Show just the module information.
-// phpinfo(8) yields identical results.
-phpinfo(INFO_MODULES);
-
-?>" > $rootPath/index.php
-        then
-                echo "ERROR: Not able to write in file $rootPath/index.php. Please check permissions."
-                exit;
-        else
-                echo "Added content to $rootPath/index.php"
-        fi
-fi
-
-if ! [ -d $sitesEnable ]; then
-        mkdir -pv $sitesEnable
-        chmod 777 $sitesEnable
-fi
-
-if ! [ -d $sitesAvailable ]; then
-        mkdir -pv $sitesAvailable
-        chmod 777 $sitesAvailable
-fi
-
-configName=$newdomain
-
-if ! echo "server {
-  listen 80;
-  listen [::]:80;
-  server_name $newdomain;
-  root /var/www/$newdomain/;
-  index index.php index.html index.htm index.nginx-debian.html;
-
-  location / {
-    try_files "'$uri'" "'$uri'"/ /index.php;
-  }
-
-  location ~ \.php$ {
-    fastcgi_pass unix:/run/php/php7.4-fpm.sock;
-    fastcgi_param SCRIPT_FILENAME "'$document_root$fastcgi_script_name'";
-    include fastcgi_params;
-    include snippets/fastcgi-php.conf;
-  }
-
- # A long browser cache lifetime can speed up repeat visits to your page
-  location ~* \.(jpg|jpeg|gif|png|webp|svg|woff|woff2|ttf|css|js|ico|xml)$ {
-       access_log        off;
-       log_not_found     off;
-       expires           360d;
-  }
-
-  # disable access to hidden files
-  location ~ /\.ht {
-      access_log off;
-      log_not_found off;
-      deny all;
-  }
-}" > $sitesAvailable$newdomain.conf
-then
-        echo "There is an ERROR create $configName file"
-        exit;
-else
-        echo "New Virtual Host Created"
-fi
-
-# Symlink
-sudo ln -s /etc/nginx/sites-available/$newdomain.conf /etc/nginx/sites-enabled/
-
-rm /etc/nginx/sites-enabled/default
+serverRoot='/var/www/html/'
 
 # Install Letsencrypt Certbot
 apt install -y python3-certbot-nginx
@@ -275,7 +153,7 @@ wget https://wordpress.org/latest.tar.gz
 tar -xzvf latest.tar.gz
 rm latest.tar.gz
 cd wordpress
-mv * /$rootPath
+mv * /$serverRoot
 
 echo "Downloaded latest Wordpress. \n Creating new database for $newdomain"
 sleep 2
@@ -294,9 +172,9 @@ MYSQL_SCRIPT
 echo "Root Password is $MYSQL_ROOT_PASSWORD 
 Wordpress Username is user$db
 Wordpress Database Name is db_$db
-Wordpress Password is  $WP_PASSWORD" > ~/passwords_$newdomain.txt
+Wordpress Password is  $WP_PASSWORD" > ~/passwords.txt
 
-cd /$rootPath
+cd /$serverRoot
 #create wp config
 cp wp-config-sample.php wp-config.php
 sed -i "s/^.*DB_NAME.*$/define('DB_NAME', 'db_${db}');/" wp-config.php
