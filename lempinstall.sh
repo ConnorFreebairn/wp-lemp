@@ -138,8 +138,8 @@ mkdir -pv /var/www/phpmyadmin/tmp; chown www-data:www-data /var/www/phpmyadmin/t
 ln -s /var/www/phpmyadmin/ /var/www/html/phpmyadmin;  mkdir -pv /var/www/logs;  chown www-data:www-data /var/www/html; chown www-data:www-data /var/www/logs; chown www-data:www-data /var/www; chmod -R g+rw /var/www;
 
 # Create Nginx virtual host config
-newdomain=""
-domain='html'
+newdomain="html"
+domain=$1
 rootPath=$2
 sitesEnable='/etc/nginx/sites-enabled/'
 sitesAvailable='/etc/nginx/sites-available/'
