@@ -139,40 +139,12 @@ ln -s /var/www/phpmyadmin/ /var/www/html/phpmyadmin;  mkdir -pv /var/www/logs;  
 
 # Create Nginx virtual host config
 newdomain=""
-domain=$1
+domain='html'
 rootPath=$2
 sitesEnable='/etc/nginx/sites-enabled/'
 sitesAvailable='/etc/nginx/sites-available/'
 serverRoot='/var/www/'
 domainRegex="^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$"
-
-while [ "$domain" = "" ]
-do
-        echo "Please provide your PRIMARY domain (sub domain not required):"
-        read domain
-done
-
-until [[ $domain =~ $domainRegex ]]
-do
-        echo "Enter valid domain:"
-        read domain
-done
-
-echo "Enter sub domain:"
-        read subdomain
-
-if [ -z "$subdomain" ]
-then
-		newdomain="$domain"
-echo $newdomain
-else
-	
-		newdomain="${subdomain}.${domain}"
-
-echo $newdomain
-fi
-
-
 
 if [ -e $newdomain ]; then
         echo "This domain already exists.\nPlease Try Another one"
