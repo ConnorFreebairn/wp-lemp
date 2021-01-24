@@ -2,7 +2,7 @@
 
 # Author : Riyas Rawther
 
-apt-get update; apt-get upgrade -y; apt-get install -y fail2ban ufw;
+apt-get update; apt-get install -y fail2ban ufw;
 # SSH, HTTP and HTTPS
 ufw allow 22
 ufw allow 80
@@ -56,6 +56,7 @@ sudo systemctl start php7.4-fpm
 #Install Composer
 curl -sS https://getcomposer.org/installer | php
 mv composer.phar /usr/local/bin/composer
+export COMPOSER_ALLOW_SUPERUSER=1;
 
 #Install and configure Memcached
 apt-get install -y memcached
