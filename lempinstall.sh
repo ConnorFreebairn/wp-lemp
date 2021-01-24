@@ -171,7 +171,7 @@ ln -s /var/www/phpmyadmin/ /var/www/html/phpmyadmin;  mkdir -pv /var/www/logs;  
 #Create Nginx virtual host config
 
 newdomain=""
-domain=$1
+domain="website"
 rootPath=$2
 sitesEnable='/etc/nginx/sites-enabled/'
 sitesAvailable='/etc/nginx/sites-available/'
@@ -183,15 +183,6 @@ do
         echo "Please provide your PRIMARY domain (sub domain not required):"
         read domain
 done
-
-until [[ $domain =~ $domainRegex ]]
-do
-        echo "Enter valid domain:"
-        read domain
-done
-
-echo "Enter sub domain:"
-        read subdomain
 
 if [ -z "$subdomain" ]
 then
