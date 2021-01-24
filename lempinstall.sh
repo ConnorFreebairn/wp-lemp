@@ -366,3 +366,5 @@ APT::Periodic::Unattended-Upgrade "1";
 EOF
 
 systemctl disable wordpressinstall.service
+systemctl mask wordpressinstall.service
+reboot
